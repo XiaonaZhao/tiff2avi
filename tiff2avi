@@ -1,0 +1,51 @@
+%Author: nonazhao2016@gmail.com;
+%Date: 2017/12/08
+%Question description:
+% Convert a big .tiff sequence into .avi, while occupying quite little memory
+
+
+% n = 16114; %number of image
+% frame = 1; %start site
+framesPath = 'E:\20171125\TIFF\4_CdS_Pike_500 mMNa2S+Na2SO3_-0\';
+% aviObj = VideoWriter('examples.avi'); %give avi file a name
+aviName = 'examples.avi'; %give avi file a name
+fps = 24; %FrameRate
+startFrame = 1; %start frame
+endFrame = 16000; %end frame 
+%----if rename---------
+if(exist('aviName','file'))  
+    delete aviName.avi
+end
+
+%----set video basic info---
+aviObj = VideoWriter(aviName);
+aviobj.FrameRate = fps;
+
+%----begin save image--
+open(aviObj); %Open file for writing video data 
+for i = (startFrame-1):(endFrame-1) %put image into avi
+%     fileName = strcat('1_',sprintf('%05d',i),'.raw','.tiff');
+    fileName = strcat('4_',sprintf('%05d',i),'.raw');
+    %filename is 1_00000.raw 1_00001.raw 1_00003.raw ...
+    
+% % When using writeVideo() converting tiff into avi, images need to be in
+% % the format of double, single or uint8. However, our images are in int16.
+% % solution: read tiff[-225 225] -> double[0 1] -> histogram
+%     frame = double(imread([framesPath,fileName,'.tiff'])); %too dark
+%     frame = uint8(imread([framesPath,fileName,'.tiff'])); %too bright
+%     frame = im2double(imread([framesPath,fileName,'.tiff'])); %the same as double
+    frame = histeq(im2double(imread([framesPath,fileName,'.tiff'])));
+    writeVideo(aviObj, frame); %write one frame into aviObj
+    clear frame; %release the memory of the written frame
+%     d = double(imread(fileName));
+%     di = uint16(d*6+32768);  % תΪuint16
+%     clear d; %release the memory
+% %     im = zeros(640,480,1);
+%     frame = frame + 1; %flash go on
+%     aviObj = writeVideo(aviObj, di);
+%     clear di; %release the memory
+end
+close(aviObj); %close class
+% mov = aviread('examples.avi');
+% movie(mov);
+% close all;
